@@ -69,7 +69,7 @@ if Config.HOSTNAME == "kapipad":
     Config.WORKLOAD_SEED_START = 15721
     Config.WORKLOAD_SEED_END = 15730  # 15820  # 15730
     Config.AUTOGLUON_TIME_LIMIT_S = 300  # 10
-elif Config.HOSTNAME in ["dev8", "dev9"]:
+elif Config.HOSTNAME in ["dev8", "dev9", "dev7"]:
     Config.PGTUNE_STATEMENTS = [
         # WARNING
         # this tool not being optimal
@@ -98,7 +98,7 @@ elif Config.HOSTNAME in ["dev8", "dev9"]:
         "ALTER SYSTEM SET max_parallel_workers = '80';",
         "ALTER SYSTEM SET max_parallel_maintenance_workers = '4';",
     ]
-    Config.TPCH_DATA = Path("/tpch_sf100").absolute()
+    Config.TPCH_DATA = Path("/tpch_sf10").absolute()
     Config.WORKLOAD_SEED_START = 15721
     Config.WORKLOAD_SEED_END = 15820  # 16720
     Config.AUTOGLUON_TIME_LIMIT_S = 60 * 5

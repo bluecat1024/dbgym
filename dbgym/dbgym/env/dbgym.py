@@ -9,6 +9,8 @@ from gymnasium.core import ActType, ObsType
 from gymnasium.spaces import Space
 from sqlalchemy import NullPool, create_engine, text
 from tqdm import tqdm
+import json
+from pathlib import Path
 
 
 class DbGymEnv(gymnasium.Env):
@@ -65,22 +67,33 @@ class DbGymEnv(gymnasium.Env):
         query_num = 0
         obs_idx = 0
 
-        with self._engine.connect() as conn:
-            for sql in self.setup_sqls:
-                conn.execute(text(sql))
-            for workload in tqdm(self.workloads, desc=f"{self.name}: Iterating over workloads.", leave=None):
-                for sql_text in tqdm(workload.queries, desc=f"{self.name}: Running queries in workload.", leave=None):
+        # with self._engine.connect() as conn:
+        #     for sql in self.setup_sqls:
+        #         conn.execute(text(sql))
+        #     for workload in tqdm(self.workloads, desc=f"{self.name}: Iterating over workloads.", leave=None):
+        #         for sql_text in tqdm(workload.queries, desc=f"{self.name}: Running queries in workload.", leave=None):
+        # fw = open(Path('/trace/log.txt').absolute(), 'w+')
+        # fw.write('Parsing plan dicts\n')
+        for line in open(Path('/trace/trace.txt').absolute()):
+                    # fw.write(line)
+                    json_dict = json.loads(line.strip())
                     query_num += 1
                     # TODO(WAN): hack!!
+                    # TODO(LICHEN): hack!!
+                    sql_text = json_dict["query_text"]
                     can_prefix = sql_text.strip().lower().split()[0] in ["delete", "insert", "select", "update"]
-                    if can_prefix:
-                        sql = text(self.observation_space.SQL_PREFIX + sql_text)
-                    else:
-                        sql = text(sql_text)
-                    results = conn.execute(sql)
-                    assert results.returns_rows if can_prefix else True, f"What happened? SQL: {sql}"
-                    if results.returns_rows:
-                        results = results.fetchall()
+                    # if can_prefix:
+                    #     sql = text(self.observation_space.SQL_PREFIX + sql_text)
+                    # else:
+                    #     sql = text(sql_text)
+                    # results = conn.execute(sql)
+                    # assert results.returns_rows if can_prefix else True, f"What happened? SQL: {sql}"
+                    results = json_dict["plan"]
+
+                    # if results.returns_rows:
+                    if results is not None:
+                        # results = results.fetchall()
+                        # result_dicts = results[0][0]
                         if can_prefix and isinstance(self.observation_space, QPPNetFeatures):
                             assert len(results) == 1, "Multi-query SQL?"
                             assert len(results[0]) == 1, "Multi-column result for EXPLAIN?"
@@ -90,8 +103,10 @@ class DbGymEnv(gymnasium.Env):
                                     result_dict,
                                     query_num,
                                     obs_idx,
-                                    str(sql),
+                                    # str(sql),
+                                    sql_text,
                                 )
                                 obs_idx += len(new_observations)
                                 observations.extend(new_observations)
+        # fw.close()
         return observations, infos

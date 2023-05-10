@@ -30,6 +30,11 @@ sudo apt install make gcc
 ./setup/tpch/tpch_schema.sh
 ./setup/tpch/tpch_queries.sh
 
+# Load trace to volume.
+docker run --volume=trace:/trace --name trace busybox true
+docker cp --quiet ./trace/trace.txt trace:/trace
+docker rm trace
+
 docker compose down --remove-orphans
 docker compose --profile gym --profile nyoom build
 docker compose --profile gym --profile nyoom up --exit-code-from dbgym

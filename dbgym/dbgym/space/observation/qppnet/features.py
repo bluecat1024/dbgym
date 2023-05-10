@@ -110,6 +110,7 @@ class QPPNetFeatures(spaces.Sequence, BaseFeatureSpace):
             "Actual Rows": spaces.Box(low=0, high=np.inf, dtype=np.int32, seed=seed),
             "Actual Startup Time (ms)": spaces.Box(low=0, high=np.inf, dtype=np.float32, seed=seed),
             "Actual Total Time (ms)": spaces.Box(low=0, high=np.inf, dtype=np.float32, seed=seed),
+            "Actual Total Time (us)": spaces.Box(low=0, high=np.inf, dtype=np.float32, seed=seed),
             "Children Observation Indexes": spaces.Sequence(
                 spaces.Box(low=0, high=np.inf, dtype=np.int64, seed=seed), seed=seed
             ),
@@ -204,6 +205,7 @@ class QPPNetFeatures(spaces.Sequence, BaseFeatureSpace):
             ("Actual Rows", self._singleton(plan_dict["Actual Rows"])),
             ("Actual Startup Time (ms)", self._singleton(plan_dict["Actual Startup Time"])),
             ("Actual Total Time (ms)", self._singleton(plan_dict["Actual Total Time"])),
+            ("Actual Total Time (us)", self._singleton(1000 * plan_dict["Actual Total Time"])),
             ("Children Observation Indexes", output_children_observation_indexes),
             ("Differenced Time (ms)", self._singleton(get_differenced_time(plan_dict))),
             ("Features", self._featurize(plan_dict)),

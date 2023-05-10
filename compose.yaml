@@ -47,8 +47,9 @@ services:
       - "trainer:/trainer"
       - "tpch_sf1:/tpch_sf1"
       - "tpch_sf10:/tpch_sf10"
-      - "tpch_sf100:/tpch_sf100"
+      # - "tpch_sf100:/tpch_sf100"
       - "/tmp/:/tmp/"
+      # - "/home/lichenj/dbgym/trace:/trace"
 
   monitor:
     build:
@@ -113,6 +114,7 @@ services:
       - "dbgym:/dbgym"
       - "tpch_queries:/tpch_queries"
       - "tpch_schema:/tpch_schema"
+      - "trace:/trace"
     profiles:
       - "gym"
 
@@ -130,4 +132,6 @@ volumes:
   tpch_sf100:
     external: true
   tpch_queries:
+    external: true
+  trace:
     external: true

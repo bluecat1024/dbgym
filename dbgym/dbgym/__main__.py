@@ -405,9 +405,9 @@ def generate_data():
             db_snapshot.to_file(db_snapshot_path)
             print("Snapshot: complete.")
 
-        gym("test", db_snapshot_path, test_workloads, seed=seed, overwrite=False)
-        gym("default", db_snapshot_path, default_workloads, seed=seed, overwrite=False)
-        gym("tablesample", db_snapshot_path, tablesample_workloads, seed=seed, overwrite=False)
+        gym("test", db_snapshot_path, test_workloads, seed=seed, overwrite=True)
+        gym("default", db_snapshot_path, default_workloads, seed=seed, overwrite=True)
+        gym("tablesample", db_snapshot_path, tablesample_workloads, seed=seed, overwrite=True)
 
         engine = create_engine(
             Config.TRAINER_PG_URI, poolclass=NullPool, execution_options={"isolation_level": "AUTOCOMMIT"}
@@ -420,7 +420,7 @@ def generate_data():
         req = requests.post(Config.NYOOM_URL + "/nyoom/start/")
         assert req.status_code == 200
         print("nyoom_start: ", req.text)
-        gym("default_with_nyoom", db_snapshot_path, default_workloads, seed=seed, overwrite=False)
+        gym("default_with_nyoom", db_snapshot_path, default_workloads, seed=seed, overwrite=True)
         req = requests.post(Config.NYOOM_URL + "/nyoom/stop/")
         assert req.status_code == 200
         print("nyoom_stop: ", req.text)
@@ -429,8 +429,8 @@ def generate_data():
 class Model:
     @staticmethod
     def save_model_eval(_expt_name: str, _df: pd.DataFrame, _train_data: TabularDataset, _test_data: TabularDataset):
-        if (Config.SAVE_PATH_EVAL / _expt_name).exists():
-            return
+        # if (Config.SAVE_PATH_EVAL / _expt_name).exists():
+        #     return
 
         expt_autogluon = AutogluonModel(Config.SAVE_PATH_MODEL / _expt_name)
         if not expt_autogluon.try_load():
@@ -684,14 +684,14 @@ class Plot:
 
 def main():
     pass
-    # generate_data()
-    # Model.generate_model()
-    # Plot.generate_plot()
+    generate_data()
+    Model.generate_model()
+    Plot.generate_plot()
     # Model.generate_model_sweep_tpch()
     # Plot.generate_plot_sweep_tpch()
     # Model.generate_model_noise_tpch()
     # Plot.generate_plot_noise_tpch()
-    # Plot.generate_tpch_runtime_by_operator_HACK()
+    Plot.generate_tpch_runtime_by_operator_HACK()
 
 
 if __name__ == "__main__":

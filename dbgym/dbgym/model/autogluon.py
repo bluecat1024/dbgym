@@ -29,6 +29,7 @@ class AutogluonModel:
         eval_df = pd.concat([y_pred, dataset["Actual Total Time (us)"]], axis=1)
         eval_df.columns = ["Predicted Latency (us)", "Actual Latency (us)"]
         eval_df["diff (us)"] = (eval_df["Predicted Latency (us)"] - eval_df["Actual Latency (us)"]).abs()
+        eval_df["diff (ms)"] = eval_df["diff (us)"] / 1e3
         eval_df["q_err"] = np.nan_to_num(
             np.maximum(
                 eval_df["Predicted Latency (us)"] / eval_df["Actual Latency (us)"],
